@@ -1,0 +1,23 @@
+import cv2
+image = cv2.imread("image_path.jpg")
+cv2.imshow("Original",image)
+resized_image = cv2.resize(image, (720, 480)) 
+cv2.imshow("Resized image",resized_image)
+# Rotate the image 
+center = (image.shape[1] // 2, image.shape[1] // 2)  # Center of the image
+angle = 45  # Rotation angle
+scale = 1.0  # Scaling factor
+rotation_matrix = cv2.getRotationMatrix2D(center, angle, scale)
+rotated_image = cv2.warpAffine(image, rotation_matrix, (image.shape[1], image.shape[0]))
+cv2.imshow("Rotated Image", rotated_image)
+# Crop a region of interest (ROI) from the image 
+x1, y1, x2, y2 = 50, 50, 300, 300
+roi = image[y1:y2, x1:x2] 
+cv2.imshow("ROI",roi)
+# Apply Gaussian blur to the image 
+blurred_image = cv2.GaussianBlur(image, (5,5), 0) 
+cv2.imshow("Blurred Image", blurred_image) 
+# Wait for a key press to close the windows 
+cv2.waitKey(0) 
+# Close all OpenCV windows 
+cv2.destroyAllWindows()
