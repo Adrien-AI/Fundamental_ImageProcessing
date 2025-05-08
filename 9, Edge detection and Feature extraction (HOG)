@@ -24,18 +24,16 @@ rescale_inten = exposure.rescale_intensity(img_hog, in_range=(0, 2))
 
 # Display Original Image and HOG Features
 figure, (a1, a2) = plt.subplots(1, 2, figsize=(12, 6), sharex=True, sharey=True)
-
 a1.axis('off')
 a1.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB for correct color display
 a1.set_title('Original Image')
-
 a2.axis('off')
 a2.imshow(rescale_inten, cmap='gray')
 a2.set_title('Histogram of Oriented Gradients (HOG) Image')
-
 plt.show()
+
 cv2.imshow("Gray",image)
-cv2.imshow("HOC", img_hog)
-cv2.imshow("NO idea", rescale_inten)
+cv2.imshow("HOG", img_hog)
+cv2.imshow("Rescaling_HOG", rescale_inten)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
