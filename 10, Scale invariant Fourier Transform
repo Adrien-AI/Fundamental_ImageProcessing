@@ -1,0 +1,10 @@
+import cv2
+image = cv2.imread("image_path.jpg")
+gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+shift = cv2.SIFT_create()
+keypoints, description = shift.detectAndCompute(gray_image,None)
+image_with_keypoints = cv2.drawKeypoints(image,keypoints,None)
+cv2.imshow("original",image)
+cv2.imshow("Image with Keypoints", image_with_keypoints)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
