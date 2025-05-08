@@ -1,0 +1,24 @@
+import cv2
+import numpy as np
+image= cv2.imread("my_name.jpg")
+img = cv2.resize(image, (300,300))
+img_rgb = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+img_reshape= img_rgb.reshape((-1,3))
+#data type coversion
+vec= np.float32(img_reshape)
+# iterate termination criteria
+crit = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER,1000,0.2)
+k = 3
+attempts = 10
+#K means clustering
+ret,labels,center = cv2.kmeans(vec,k,None,crit,attempts,cv2.KMEANS_RANDOM_CENTERS)
+# unit clustering
+center = np.uint8(center)
+#Flattening and Reshaping
+img_segmentation = center[labels.flatten()]
+img_seg = img_segmentation.reshape((img.shape))
+#Display Original and segmented Image 
+cv2.imshow('Original image' , img)
+cv2.imshow("Segmented Image", img_seg)
+if cv2.waitKey(0) & 0xFF == 27:
+    cv2.destoryAllWindows()
