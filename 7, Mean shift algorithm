@@ -1,0 +1,11 @@
+import cv2
+image= cv2.imread("exp77.jpg")
+img = cv2.resize(image, (500,500))
+spaital_radius = 150
+color_radius = 150
+max_pyramid = 3
+shifted_image = cv2.pyrMeanShiftFiltering(img, sp=spaital_radius,sr = color_radius, maxLevel = max_pyramid)
+cv2.imshow("Orginal image", img)
+cv2.imshow("Mean shift segmented image", img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
