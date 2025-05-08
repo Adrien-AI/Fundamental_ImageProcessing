@@ -1,0 +1,94 @@
+# Import necessary libraries
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+# Load an image from file
+image = cv2.imread("image_path.jpg")
+
+# Check if the image is loaded
+if image is None:
+    raise ValueError("Image not found. Check the file path.")
+
+# Convert to RGB for correct color display in matplotlib
+img_RGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+plt.figure(figsize=(8, 6))
+plt.imshow(img_RGB)
+plt.title("Original Image")
+plt.show()
+
+# Convert the image to grayscale
+img_gray = cv2.cvtColor(img_RGB, cv2.COLOR_RGB2GRAY)
+plt.imshow(img_gray, cmap='gray')
+plt.title("Grayscale Image")
+plt.show()
+
+# Image thresholding
+Image_median = cv2.medianBlur(img_gray, 1)
+
+# Define a threshold value (was undefined in original code)
+threshold_value = 127  # Example value; adjust as needed
+ret, threshold_image = cv2.threshold(Image_median, threshold_value, 255, cv2.THRESH_BINARY_INV)
+
+adaptive_threshold_image = cv2.adaptiveThreshold(
+    Image_median, 255,  # maxValue should be 255, not threshold_value
+    cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+    cv2.THRESH_BINARY,
+    11, 2
+)
+
+plt.imshow(adaptive_threshold_image, cmap='gray')
+plt.title("Adaptive Threshold")
+plt.show()
+
+# Noise Removal
+kernel = np.ones((3, 3), np.uint8)
+opening_image = cv2.morphologyEx(adaptive_threshold_image, cv2.MORPH_OPEN, kernel, iterations=5)
+plt.imshow(opening_image, cmap='gray')
+plt.title("Opening (Noise Removed)")
+plt.show()
+
+# Sure Background Area
+sure_bg = cv2.dilate(opening_image, kernel, iterations=4)
+plt.imshow(sure_bg, cmap='gray')
+plt.title("Sure Background")
+plt.show()
+
+# Finding Sure Foreground Area
+dist_transform = cv2.distanceTransform(opening_image, cv2.DIST_L2, 5)
+plt.subplot(1, 2, 1)
+plt.imshow(dist_transform, cmap='gray')
+plt.title('Distance Transform')
+
+ret, sure_fg = cv2.threshold(dist_transform, 0.7 * dist_transform.max(), 255, 0)
+sure_fg = np.uint8(sure_fg)
+
+plt.subplot(1, 2, 2)
+plt.imshow(sure_fg, cmap='gray')
+plt.title('Sure Foreground')
+plt.show()
+
+# Finding Unknown Region
+unknown = cv2.subtract(sure_bg, sure_fg)
+plt.imshow(unknown, cmap='gray')
+plt.title("Unknown Region")
+plt.show()
+
+# Marker Labelling
+ret, markers = cv2.connectedComponents(sure_fg)
+
+# Add 1 to all labels so that sure background is not 0
+markers = markers + 1
+
+# Mark the unknown region with zero
+markers[unknown == 255] = 0
+
+# Apply watershed
+markers = cv2.watershed(image, markers)
+image[markers == -1] = [255, 0, 0]  # Mark boundary in red
+
+# Show result
+result_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+plt.imshow(result_image)
+plt.title("Watershed Result")
+plt.show()
